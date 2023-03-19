@@ -11,13 +11,18 @@ import web.service.UserService;
 @RequestMapping("/users")
 public class UsersController {
 
-    @Autowired
+
     private UserService userService;
 
-    @GetMapping()
-    public String index(Model model) {
-        model.addAttribute("users", userService.index());
-        return "index";
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public String showAllUsers(Model model) {
+        model.addAttribute("users", userService.showAllUsers());
+        return "showAllUsers";
     }
 
     @GetMapping("/{id}")

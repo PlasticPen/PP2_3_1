@@ -1,46 +1,45 @@
 package web.dao;
 
-import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import web.model.User;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+
 @Repository
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-
-    @SuppressWarnings("unchecked")
-    public List<User> index() {
-        return (entityManager.createQuery("from User ").getResultList());
+    public List<User> showAllUsers() {
+        return (entityManager.createQuery("select u from User u", User.class).getResultList());
 
     }
 
     public User show(int id) {
-        Session session = entityManager.unwrap(Session.class);
-        return session.get(User.class, id);
+        String ql = "select u from User u where u.id = :id";
+        return (entityManager.createQuery(ql, User.class).setParameter("id", id).getSingleResult());
     }
 
     public void save(User user) {
-        Session session = entityManager.unwrap(Session.class);
-        session.save(user);
+        entityManager.persist(user);
     }
 
     public void update(int id, User updatedUser) {
-        Session session = entityManager.unwrap(Session.class);
-        User userToBeUpdated = session.get(User.class, id);
+        String ql = "select u from User u where u.id = :id";
+        User userToBeUpdated =
+                entityManager.createQuery(ql, User.class).setParameter("id", id).getSingleResult();
         userToBeUpdated.setName(updatedUser.getName());
         userToBeUpdated.setSurname(updatedUser.getSurname());
         userToBeUpdated.setEmail(updatedUser.getEmail());
+
     }
 
     public void delete(int id) {
-        Session session = entityManager.unwrap(Session.class);
-        session.remove(session.get(User.class, id));
+        String ql = "select u from User u where u.id = :id";
+        User user = entityManager.createQuery(ql, User.class).setParameter("id", id).getSingleResult();
+        entityManager.remove(user);
     }
 }
